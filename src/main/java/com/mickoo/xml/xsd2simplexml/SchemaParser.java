@@ -74,7 +74,7 @@ public class SchemaParser {
     }
 
     protected JType getJType(JCodeModel codeModel, String type) {
-        if ("string".equals(type)) {
+        if ("string".equals(type) || "language".equals(type) || "anyURI".equals(type)) {
             return codeModel._ref(String.class);
         } else if ("int".equals(type) || "integer".equals(type) || "byte".equals(type) || "negativeInteger".equals(type) || "nonNegativeInteger".equals(type) || "nonPositiveInteger".equals(type) || "positiveInteger".equals(type) || "short".equals(type) || "unsignedInt".equals(type) || "unsignedShort".equals(type) || "byte".equals("unsignedByte")) {
             return codeModel._ref(Integer.class);
@@ -82,6 +82,8 @@ public class SchemaParser {
             return codeModel._ref(Long.class);
         } else if ("decimal".equals(type)) {
             return codeModel._ref(Double.class);
+        } else if ("dateTime".equals(type)) {
+            return codeModel._ref(Date.class);
         } else if ("boolean".equals(type)) {
             return codeModel._ref(Boolean.class);
         }
@@ -289,14 +291,14 @@ public class SchemaParser {
 
             GeneratedClass enumClass = codeGenerator.createEnum(
                     simpleType.getTargetNamespace(),
-                    simpleType.getName(),
+                    simpleType.getName() != null ? simpleType.getName() : name,
                     restrictions.enumeration,
                     enumBinding
             );
 
             //add enumeration property to class
 
-            String className = NameConverter.smart.toClassName(simpleType.getName());
+            String className = NameConverter.smart.toClassName(simpleType.getName() != null ? simpleType.getName() : name);
             if(enumBinding != null && !Utils.isEmpty(enumBinding.getClassName())) className = enumBinding.getClassName();
 
             parseContext.currentClass.addElement(
